@@ -1,4 +1,4 @@
-# hawkular-client-cli
+# hawkular-client-for-checkmk
 
 This repository includes a Python client script to access Hawkular metrics remotely.
 
@@ -29,18 +29,7 @@ The script is using the python [hawkular-client](https://github.com/hawkular/haw
 
 ## Installation
 
-To install, run ``python setup.py install`` if you installed from source code, or ``pip install hawkular-client-cli`` if using pip.
-
-### Copr repository
-
-Packages can be downloaded using Fedora Copr:
-
-```bash
-dnf copr enable @Hawkular/python-hawkular-client 
-dnf copr enable yaacov/hawkular-cli 
-
-dnf install hawkular-client-cli
-```
+To install, run ``python setup.py install`` if you installed from source code, or ``pip install hawkular-client-for-checkmk`` if using pip.
 
 ## Usage
 

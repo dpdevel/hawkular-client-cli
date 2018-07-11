@@ -1,13 +1,10 @@
 """
     Copyright 2016 Red Hat, Inc. and/or its affiliates
     and other contributors.
-
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
     You may obtain a copy of the License at
-
        http://www.apache.org/licenses/LICENSE-2.0
-
     Unless required by applicable law or agreed to in writing, software
     distributed under the License is distributed on an "AS IS" BASIS,
     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,7 +15,7 @@
 from __future__ import (absolute_import, division,
                         print_function, unicode_literals)
 
-_VERSION = '0.18.3'
+_VERSION = '0.18.4'
 _DESCRIPTION = 'Read/Write data to and from a Hawkular metric server.'
 
 import os
@@ -121,6 +118,8 @@ class CommandLine(object):
                             help='query hawkular alert triggers')
         parser.add_argument('-N', '--no-autotags', dest='no_autotags', action='store_true',
                             help='do not update tags using the config file')
+        parser.add_argument('--check-mk', action='store_true', dest='check_mk',
+                            help='print for check_mk monitoring')
         parser.add_argument('-v', '--version', action='store_true',
                             help='print version')
         args = parser.parse_args()
@@ -235,7 +234,11 @@ class CommandLine(object):
         """
         definitions = self.client.query_tenants()
         for definition in definitions:
-            print('id: ', definition.get('id'))
+            if not self.args.check_mk:
+                print('id: ', definition.get('id'))
+            else:
+                tenatname = definition.get('id').split(":")
+                print(tenatname[0])
 
     def _query_metric_stats_by_keys(self):
         """ get meric data
@@ -277,17 +280,23 @@ class CommandLine(object):
         definitions = self.client.query_metric_definitions(metric_type=self.metric_type, **tags)
         for definition in definitions:
             key = definition.get('id')
-            print('key:', key)
+            if not self.args.check_mk:
+                print('key:', key)
+
             values = self.client.query_metric(self.metric_type, key,
                 start=int(total_milisecond(self.args.start)),
                 end=int(total_milisecond(self.args.end)),
                 limit=self.args.limit)
-            print('values:')
+            if not self.args.check_mk:
+                print('values:')
+
             for value in values:
                 timestamp = value.get('timestamp')
                 timestr = datetime.fromtimestamp(timestamp / 1000).strftime('%Y-%m-%d %H:%M:%S')
-                print ('    ', timestamp, '(', timestr, ')', value.get('value'))
-            print()
+                if self.args.check_mk:
+                    print (value.get('value'))
+                else:
+                    print('    ', timestamp, '(', timestr, ')', value.get('value'))
 
     def _query_metric_stats_by_tags(self):
         """ Get meric data
@@ -296,18 +305,27 @@ class CommandLine(object):
         definitions = self.client.query_metric_definitions(metric_type=self.metric_type, **tags)
         for definition in definitions:
             key = definition.get('id')
-            print('key:', key)
+            if not self.args.check_mk:
+                print('key:', key)
+
             values = self.client.query_metric_stats(self.metric_type, key,
                 start=int(total_milisecond(self.args.start)),
                 end=int(total_milisecond(self.args.end)),
                 bucketDuration="{0}s".format(self.args.bucketDuration),
                 limit=self.args.limit)
-            print('values:')
+
+            if not self.args.check_mk:
+                print('values:')
+
             for value in values:
                 timestamp = value.get('start')
                 timestr = datetime.fromtimestamp(timestamp / 1000).strftime('%Y-%m-%d %H:%M:%S')
-                print ('    ', timestamp, '(', timestr, ') avg:', value.get('avg'), '[',value.get('samples'), ']')
-            print()
+
+                if self.args.check_mk:
+                    print('    ', timestamp, '(', timestr, ') avg:', value.get('avg'), '[', value.get('samples'), ']')
+                else:
+                    print ('    ', timestamp, '(', timestr, ') avg:', value.get('avg'), '[',value.get('samples'), ']')
+
 
     def _push(self):
         """ Push meric data
