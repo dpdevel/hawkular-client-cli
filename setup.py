@@ -3,9 +3,9 @@ from setuptools import setup
 _VERSION = '0.18.3'
 _DESCRIPTION = 'Read/Write data to and from a Hawkular metric server.'
 
-setup(name='hawkular-client-cli',
+setup(name='hawkular-client-for-checkmk',
     version=_VERSION,
-    description='Hawkular client cli',
+    description='Hawkular client cli fof ChecMK output',
     long_description=_DESCRIPTION,
     classifiers=[
         'Development Status :: 4 - Beta',
@@ -15,9 +15,9 @@ setup(name='hawkular-client-cli',
         'Programming Language :: Python :: 3',
         'Topic :: System :: Monitoring',
     ],
-    url='http://github.com/yaacov/hawkular-client-cli',
-    author='Yaacov Zamir',
-    author_email='yzamir@redhat.com',
+    url='http://github.com/dpdevel/hawkular-client-for-checkmk',
+    author='Domenico Pastore',
+    author_email='domenico.pastore93@gmail.com',
     license='Apache License 2.0',
     packages=['hawkular_client_cli'],
     install_requires=[
